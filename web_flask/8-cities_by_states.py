@@ -9,7 +9,8 @@ The script starts Flask web application
             /number/<n>:          display "n is a number" only if int
             /number_template/<n>: display HTML page only if n is int
             /number_odd_or_even/<n>: display HTML page; display odd/even info
-            /states_list:         display HTML and state info from storage;
+            /states_list:         display HTML and state info from storage
+            /cities_by_states:    display HTML and state, city relations
 """
 from models import storage
 from models import *
@@ -32,7 +33,7 @@ def hbnb():
 
 @app.route('/c/<text>')
 def custom_text(text):
-    """Display custom text: """
+    """Display custom text given"""
     return "C {}".format(text.replace('_', ' '))
 
 
@@ -51,15 +52,15 @@ def txt_if_int(n):
 
 @app.route('/number_template/<int:n>')
 def html_given_int(n):
-    """display html page only if int is given"""
+    """Display html page only if int is given
+       then place given int into html template
+    """
     return render_template('5-number.html', n=n)
 
 
 @app.route('/number_odd_or_even/<int:n>')
 def html_odd_or_even(n):
-    """display html page only if int given
-       place given int into html template
-       substitute text to display if int is odd or even
+    """Display html page only if int given
     """
     odd_or_even = "even" if (n % 2 == 0) else "odd"
     return render_template('6-number_odd_or_even.html',
@@ -68,17 +69,25 @@ def html_odd_or_even(n):
 
 @app.teardown_appcontext
 def tear_down(self):
-    """Remove current SQLAlchemy session after each request """
+    """Remove current SQLAlchemy session after each request"""
     storage.close()
 
 
 @app.route('/states_list')
-def html_fetch_sorted_states():
-    """display html page
-       && fetch sorted states to insert into html in UL tag
+def html_fetch_states():
+    """Display html page
+       && fetch sorted states
     """
     state_objs = [s for s in storage.all("State").values()]
     return render_template('7-states_list.html',
+                           state_objs=state_objs)
+
+
+@app.route('/cities_by_states')
+def html_fetch_cities_by_states():
+    """Display html page"""
+    state_objs = [s for s in storage.all("State").values()]
+    return render_template('8-cities_by_states.html',
                            state_objs=state_objs)
 
 
